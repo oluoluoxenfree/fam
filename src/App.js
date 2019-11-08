@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "./firebase";
 import AddPerson from "./AddPerson";
+const db = firebase.firestore();
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -79,7 +80,13 @@ function Home({ user }) {
     <div>
       <h2>Home</h2>
       <AddPerson user={user} />
-      <PeopleTableData />
+      <PeopleTable
+        user={user}
+        people={[
+          { name: "Alex", relationship: "friend" },
+          { name: "Nina", relationship: "friend" }
+        ]}
+      />
     </div>
   );
 }
@@ -124,32 +131,16 @@ const uiConfig = {
   ]
 };
 
-class SignInScreen extends React.Component {
-  render() {
-    return (
-      <div>
-        <p>Please sign-in:</p>
-        <StyledFirebaseAuth
-          uiConfig={uiConfig}
-          firebaseAuth={firebase.auth()}
-        />
-      </div>
-    );
-  }
-}
-
-const PeopleTableData = () => {
+const SignInScreen = () => {
   return (
-    <PeopleTableRender
-      people={[
-        { name: "Alex", relationship: "friend" },
-        { name: "Nina", relationship: "friend" }
-      ]}
-    />
+    <div>
+      <p>Please sign-in:</p>
+      <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
+    </div>
   );
 };
 
-const PeopleTableRender = ({ people }) => {
+const PeopleTable = ({ user, people }) => {
   return (
     <>
       <table>
@@ -159,14 +150,16 @@ const PeopleTableRender = ({ people }) => {
             <th>Relationship</th>
           </tr>
         </thead>
-        {people.map(person => {
-          return (
-            <tr>
-              <td>{person.name}</td>
-              <td>{person.relationship}</td>
-            </tr>
-          );
-        })}
+        <tbody>
+          {people.map(person => {
+            return (
+              <tr>
+                <td>{person.name}</td>
+                <td>{person.relationship}</td>
+              </tr>
+            );
+          })}
+        </tbody>
       </table>
     </>
   );
