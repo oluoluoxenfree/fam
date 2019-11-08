@@ -79,7 +79,7 @@ function Home({ user }) {
     <div>
       <h2>Home</h2>
       <AddPerson user={user} />
-      <People />
+      <PeopleTableData />
     </div>
   );
 }
@@ -138,7 +138,18 @@ class SignInScreen extends React.Component {
   }
 }
 
-const People = () => {
+const PeopleTableData = () => {
+  return (
+    <PeopleTableRender
+      people={[
+        { name: "Alex", relationship: "friend" },
+        { name: "Nina", relationship: "friend" }
+      ]}
+    />
+  );
+};
+
+const PeopleTableRender = ({ people }) => {
   return (
     <>
       <table>
@@ -148,10 +159,7 @@ const People = () => {
             <th>Relationship</th>
           </tr>
         </thead>
-        {[
-          { name: "Alex", relationship: "friend" },
-          { name: "Nina", relationship: "friend" }
-        ].map(person => {
+        {people.map(person => {
           return (
             <tr>
               <td>{person.name}</td>
