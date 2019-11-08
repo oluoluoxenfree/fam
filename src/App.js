@@ -79,6 +79,7 @@ function Home({ user }) {
     <div>
       <h2>Home</h2>
       <AddPerson user={user} />
+      <People />
     </div>
   );
 }
@@ -142,10 +143,22 @@ const People = () => {
     <>
       <table>
         <thead>
-          <tr>Name</tr>
-          <tr>Relationship</tr>
+          <tr>
+            <th>Name</th>
+            <th>Relationship</th>
+          </tr>
         </thead>
-        {}
+        {[
+          { name: "Alex", relationship: "friend" },
+          { name: "Nina", relationship: "friend" }
+        ].map(person => {
+          return (
+            <tr>
+              <td>{person.name}</td>
+              <td>{person.relationship}</td>
+            </tr>
+          );
+        })}
       </table>
     </>
   );
