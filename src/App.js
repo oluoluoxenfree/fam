@@ -1,7 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import firebase from "firebase";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
+import firebase from "./firebase";
+import AddPerson from "./AddPerson";
 
 // This site has 3 pages, all of which are rendered
 // dynamically in the browser (not server rendered).
@@ -14,13 +15,13 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 
 export default function App({ user }) {
   if (user) {
-    return <AuthedApp />;
+    return <AuthedApp user={user} />;
   } else {
     return <SignInScreen />;
   }
 }
 
-function AuthedApp() {
+function AuthedApp({ user }) {
   return (
     <Router>
       <div>
@@ -37,6 +38,9 @@ function AuthedApp() {
           <li>
             <Link to="/login">Login</Link>
           </li>
+          <li>
+            <Link to="/add-person">Add Person</Link>
+          </li>
         </ul>
 
         <hr />
@@ -50,7 +54,7 @@ function AuthedApp() {
         */}
         <Switch>
           <Route exact path="/">
-            <Home />
+            <Home user={user} />
           </Route>
           <Route path="/about">
             <About />
@@ -70,10 +74,11 @@ function AuthedApp() {
 // You can think of these components as "pages"
 // in your app.
 
-function Home() {
+function Home({ user }) {
   return (
     <div>
       <h2>Home</h2>
+      <AddPerson user={user} />
     </div>
   );
 }
@@ -131,3 +136,17 @@ class SignInScreen extends React.Component {
     );
   }
 }
+
+const People = () => {
+  return (
+    <>
+      <table>
+        <thead>
+          <tr>Name</tr>
+          <tr>Relationship</tr>
+        </thead>
+        {}
+      </table>
+    </>
+  );
+};
