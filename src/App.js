@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "./firebase";
@@ -84,6 +84,8 @@ function Home({ user }) {
     <div>
       <h2>Home</h2>
       <AddPerson user={user} />
+      {error && <strong>Error: {JSON.stringify(error)}</strong>}
+      {loading && <span>Collection: Loading...</span>}
       {snapshot && <PeopleTable user={user} people={snapshot} />}
     </div>
   );
@@ -150,15 +152,62 @@ const PeopleTable = ({ user, people }) => {
         </thead>
         <tbody>
           {people.docs.map(person => {
-            return (
-              <tr>
-                <td>{person.data().name}</td>
-                <td>{person.data().relationship}</td>
-              </tr>
-            );
+            return <PeopleTableRow person={person} />;
           })}
         </tbody>
       </table>
     </>
   );
+};
+
+const PeopleTableRow = ({ person }) => {
+  const [editing, setEditing] = useState(false);
+  const [personForm, setPersonForm] = useState({
+    name: person.data().name,
+    relationship: person.data().relationship,
+    userId: person.data().userId
+  });
+
+  const row = (
+    <tr onClick={() => setEditing(!editing)} key={person.id}>
+      <td key={person.id}>{person.data().name}</td>
+      <td key={person.id}>{person.data().relationship}</td>
+    </tr>
+  );
+
+  const form = (
+    <tr>
+      <input
+        onChange={e => {
+          setPersonForm({ ...personForm, name: e.target.value });
+        }}
+        value={personForm.name}
+      ></input>
+      <input
+        onChange={e => {
+          setPersonForm({ ...personForm, relationship: e.target.value });
+        }}
+        value={personForm.relationship}
+      ></input>
+      <input
+        onClick={() => {
+          setEditing(!editing);
+          db.collection("people")
+            .doc(person.id)
+            .update({
+              name: personForm.name,
+              relationship: personForm.relationship
+            });
+        }}
+        type="submit"
+        value="Save"
+      ></input>
+    </tr>
+  );
+
+  console.log(person);
+
+  const html = editing ? form : row;
+
+  return html;
 };
