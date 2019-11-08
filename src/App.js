@@ -165,49 +165,63 @@ const PeopleTableRow = ({ person }) => {
   const [personForm, setPersonForm] = useState({
     name: person.data().name,
     relationship: person.data().relationship,
-    userId: person.data().userId
+    userId: person.data().userId,
+    archived: false
   });
+  if (person.data().archived !== true) {
+    const row = (
+      <tr onClick={() => setEditing(!editing)} key={person.id}>
+        <td key={person.id}>{person.data().name}</td>
+        <td key={person.id}>{person.data().relationship}</td>
+      </tr>
+    );
 
-  const row = (
-    <tr onClick={() => setEditing(!editing)} key={person.id}>
-      <td key={person.id}>{person.data().name}</td>
-      <td key={person.id}>{person.data().relationship}</td>
-    </tr>
-  );
-
-  const form = (
-    <tr>
-      <input
-        onChange={e => {
-          setPersonForm({ ...personForm, name: e.target.value });
-        }}
-        value={personForm.name}
-      ></input>
-      <input
-        onChange={e => {
-          setPersonForm({ ...personForm, relationship: e.target.value });
-        }}
-        value={personForm.relationship}
-      ></input>
-      <input
-        onClick={() => {
-          setEditing(!editing);
-          db.collection("people")
-            .doc(person.id)
-            .update({
-              name: personForm.name,
-              relationship: personForm.relationship
+    const form = (
+      <tr>
+        <input
+          onChange={e => {
+            setPersonForm({ ...personForm, name: e.target.value });
+          }}
+          value={personForm.name}
+        ></input>
+        <input
+          onChange={e => {
+            setPersonForm({ ...personForm, relationship: e.target.value });
+          }}
+          value={personForm.relationship}
+        ></input>
+        <input
+          onClick={() => {
+            setEditing(!editing);
+            db.collection("people")
+              .doc(person.id)
+              .update({
+                name: personForm.name,
+                relationship: personForm.relationship
+              });
+          }}
+          type="submit"
+          value="save"
+        ></input>
+        <input
+          onClick={() => {
+            setPersonForm({
+              ...personForm,
+              archived: (personForm.archived = true)
             });
-        }}
-        type="submit"
-        value="Save"
-      ></input>
-    </tr>
-  );
+            db.collection("people")
+              .doc(person.id)
+              .update({ archived: (personForm.archived = true) });
+          }}
+          type="submit"
+          value="archive"
+        ></input>
+      </tr>
+    );
 
-  console.log(person);
+    const html = editing ? form : row;
 
-  const html = editing ? form : row;
-
-  return html;
+    return html;
+  }
+  return null;
 };
