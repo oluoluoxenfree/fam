@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "./firebase";
 import AddPerson from "./AddPerson";
+import { useCollection } from "react-firebase-hooks/firestore";
 const db = firebase.firestore();
 
 // This site has 3 pages, all of which are rendered
@@ -76,17 +77,14 @@ function AuthedApp({ user }) {
 // in your app.
 
 function Home({ user }) {
+  const [snapshot, loading, error] = useCollection(
+    db.collection("people").where("userId", "==", user.uid)
+  );
   return (
     <div>
       <h2>Home</h2>
       <AddPerson user={user} />
-      <PeopleTable
-        user={user}
-        people={[
-          { name: "Alex", relationship: "friend" },
-          { name: "Nina", relationship: "friend" }
-        ]}
-      />
+      {snapshot && <PeopleTable user={user} people={snapshot} />}
     </div>
   );
 }
@@ -151,11 +149,11 @@ const PeopleTable = ({ user, people }) => {
           </tr>
         </thead>
         <tbody>
-          {people.map(person => {
+          {people.docs.map(person => {
             return (
               <tr>
-                <td>{person.name}</td>
-                <td>{person.relationship}</td>
+                <td>{person.data().name}</td>
+                <td>{person.data().relationship}</td>
               </tr>
             );
           })}
