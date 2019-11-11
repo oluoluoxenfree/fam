@@ -4,6 +4,18 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "./firebase";
 import AddPerson from "./AddPerson";
 import { useCollection } from "react-firebase-hooks/firestore";
+import { Field, Input } from "react-bulma-components/lib/components/form";
+import Button from "react-bulma-components/lib/components/button";
+import Table from "react-bulma-components/lib/components/table";
+import Container from "react-bulma-components/lib/components/container";
+import Section from "react-bulma-components/lib/components/section";
+import Tile from "react-bulma-components/lib/components/tile";
+import { Box } from "react-bulma-components";
+import Heading from "react-bulma-components/lib/components/heading";
+import Image from "react-bulma-components/lib/components/image";
+import "react-bulma-components/dist/react-bulma-components.min.css";
+import Navbar from "react-bulma-components/lib/components/navbar";
+
 const db = firebase.firestore();
 
 // This site has 3 pages, all of which are rendered
@@ -26,49 +38,37 @@ export default function App({ user }) {
 function AuthedApp({ user }) {
   return (
     <Router>
-      <div>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-          <li>
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-          <li>
-            <Link to="/add-person">Add Person</Link>
-          </li>
-        </ul>
+      <Navbar transparent>
+        <Navbar.Brand>
+          <Navbar.Item renderAs={Link} to="/">
+            fam
+          </Navbar.Item>
+          <Navbar.Burger />
+        </Navbar.Brand>
+        <Navbar.Menu>
+          <Navbar.Container>
+            <Navbar.Item renderAs={Link} to="/about">
+              About
+            </Navbar.Item>
+          </Navbar.Container>
+        </Navbar.Menu>
+      </Navbar>
 
-        <hr />
-
-        {/*
+      {/*
           A <Switch> looks through all its children <Route>
           elements and renders the first one whose path
           matches the current URL. Use a <Switch> any time
           you have multiple routes, but you want only one
           of them to render at a time
         */}
-        <Switch>
-          <Route exact path="/">
-            <Home user={user} />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/dashboard">
-            <Dashboard />
-          </Route>
-          <Route path="/login">
-            <Login />
-          </Route>
-        </Switch>
-      </div>
+      <Switch>
+        <Route exact path="/">
+          <Home user={user} />
+        </Route>
+        <Route path="/about">
+          <About />
+        </Route>
+      </Switch>
     </Router>
   );
 }
@@ -82,11 +82,24 @@ function Home({ user }) {
   );
   return (
     <div>
-      <h2>Home</h2>
-      <AddPerson user={user} />
-      {error && <strong>Error: {JSON.stringify(error)}</strong>}
-      {loading && <span>Collection: Loading...</span>}
-      {snapshot && <PeopleTable user={user} people={snapshot} />}
+      <Tile size={8} kind="ancestor" vertical>
+        <Section>
+          <Box>
+            <Tile kind="child">
+              <AddPerson user={user} />
+            </Tile>
+          </Box>
+        </Section>
+        <Section>
+          <Box>
+            <Tile kind="child" color="primary">
+              {error && <strong>Error: {JSON.stringify(error)}</strong>}
+              {loading && <span>Collection: Loading...</span>}
+              {snapshot && <PeopleTable user={user} people={snapshot} />}
+            </Tile>
+          </Box>
+        </Section>
+      </Tile>
     </div>
   );
 }
@@ -95,22 +108,6 @@ function About() {
   return (
     <div>
       <h2>About</h2>
-    </div>
-  );
-}
-
-function Dashboard() {
-  return (
-    <div>
-      <h2>Dashboard</h2>
-    </div>
-  );
-}
-
-function Login() {
-  return (
-    <div>
-      <h2>Login</h2>
     </div>
   );
 }
@@ -143,11 +140,13 @@ const SignInScreen = () => {
 const PeopleTable = ({ user, people }) => {
   return (
     <>
-      <table>
+      <Table>
         <thead>
           <tr>
             <th>Name</th>
             <th>Relationship</th>
+            <th> </th>
+            <th> </th>
           </tr>
         </thead>
         <tbody>
@@ -155,7 +154,7 @@ const PeopleTable = ({ user, people }) => {
             return <PeopleTableRow person={person} />;
           })}
         </tbody>
-      </table>
+      </Table>
     </>
   );
 };
@@ -178,44 +177,62 @@ const PeopleTableRow = ({ person }) => {
 
     const form = (
       <tr>
-        <input
-          onChange={e => {
-            setPersonForm({ ...personForm, name: e.target.value });
-          }}
-          value={personForm.name}
-        ></input>
-        <input
-          onChange={e => {
-            setPersonForm({ ...personForm, relationship: e.target.value });
-          }}
-          value={personForm.relationship}
-        ></input>
-        <input
-          onClick={() => {
-            setEditing(!editing);
-            db.collection("people")
-              .doc(person.id)
-              .update({
-                name: personForm.name,
-                relationship: personForm.relationship
+        <td>
+          <Field>
+            <Input
+              onChange={e => {
+                setPersonForm({ ...personForm, name: e.target.value });
+              }}
+              value={personForm.name}
+            />
+          </Field>
+        </td>
+        <td>
+          <Field>
+            <Input
+              onChange={e => {
+                setPersonForm({ ...personForm, relationship: e.target.value });
+              }}
+              value={personForm.relationship}
+            />
+          </Field>
+        </td>
+        <td>
+          <Button
+            onClick={() => {
+              setEditing(!editing);
+              db.collection("people")
+                .doc(person.id)
+                .update({
+                  name: personForm.name,
+                  relationship: personForm.relationship
+                });
+            }}
+            type="submit"
+            value="save"
+            color="primary"
+          >
+            Save
+          </Button>
+        </td>
+        <td>
+          <Button
+            onClick={() => {
+              setPersonForm({
+                ...personForm,
+                archived: (personForm.archived = true)
               });
-          }}
-          type="submit"
-          value="save"
-        ></input>
-        <input
-          onClick={() => {
-            setPersonForm({
-              ...personForm,
-              archived: (personForm.archived = true)
-            });
-            db.collection("people")
-              .doc(person.id)
-              .update({ archived: (personForm.archived = true) });
-          }}
-          type="submit"
-          value="archive"
-        ></input>
+              db.collection("people")
+                .doc(person.id)
+                .update({ archived: (personForm.archived = true) });
+            }}
+            type="submit"
+            value="archive"
+            color="danger"
+          >
+            Archive
+          </Button>
+        </td>
       </tr>
     );
 

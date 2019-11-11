@@ -1,5 +1,12 @@
 import React, { useState } from "react";
 import firebase from "./firebase";
+import {
+  Field,
+  Label,
+  Input
+} from "react-bulma-components/lib/components/form";
+import Button from "react-bulma-components/lib/components/button";
+import Heading from "react-bulma-components/lib/components/heading";
 
 const db = firebase.firestore();
 
@@ -16,38 +23,47 @@ const handleSubmit = (form, event) => {
     });
 };
 
-const user = firebase.auth().currentUser;
-
 const AddPerson = ({ user }) => {
   const [personForm, setPersonForm] = useState({
     name: "",
     relationship: "",
     userId: user.uid
   });
-  console.log(user.uid);
+
   return (
     <div>
-      <h2>Add a person</h2>
+      <Heading subtitle size={2}>
+        Add a person
+      </Heading>
       <form onSubmit={event => handleSubmit(personForm, event)}>
-        Name:{" "}
-        <input
-          placeholder="Michelle Obama"
-          value={personForm.name}
-          onChange={event => {
-            setPersonForm({ ...personForm, name: event.target.value });
-          }}
-          name="name"
-        ></input>
-        Relationship:{" "}
-        <input
-          placeholder="bestie"
-          value={personForm.relationship}
-          onChange={event => {
-            setPersonForm({ ...personForm, relationship: event.target.value });
-          }}
-          name="relationship"
-        ></input>
-        <input type="submit" value="Add"></input>
+        <Field>
+          <Label> Name: </Label>
+          <Input
+            placeholder="Michelle Obama"
+            value={personForm.name}
+            onChange={event => {
+              setPersonForm({ ...personForm, name: event.target.value });
+            }}
+            name="name"
+          />
+        </Field>
+        <Field>
+          <Label>Relationship: </Label>
+          <Input
+            placeholder="bestie"
+            value={personForm.relationship}
+            onChange={event => {
+              setPersonForm({
+                ...personForm,
+                relationship: event.target.value
+              });
+            }}
+            name="relationship"
+          />
+        </Field>
+        <Button type="submit" color="primary">
+          Add
+        </Button>
       </form>
     </div>
   );
